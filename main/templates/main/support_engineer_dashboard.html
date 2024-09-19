@@ -1,0 +1,141 @@
+<!-- main/templates/main/support_engineer_dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Engineer Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Support Engineer Dashboard</h1>
+        
+        <!-- Display the username -->
+        <p class="text-center">Logged in as: {{ user.username }}</p>
+
+        <!-- Edit Profile Button -->
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'edit_support_engineer' %}" class="btn btn-primary me-2">Edit Profile</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+        </div>
+
+        <hr>
+
+        <!-- Active Vehicles Table -->
+        <h3>Active Vehicles</h3>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>No.</th>
+                    <th>Serial Number</th>
+                    <th>Default Location (City, Area)</th>
+                    <th>Current Location (Lat, Long)</th>
+                    <th>Rented By (Mobile)</th>
+                    <th>Rent Received</th>
+                    <th>Time Remaining</th>
+                    <th>Battery Charge Status</th>
+                    <th>Lock/Unlock</th>
+                    <th>Contact Support</th>
+                    <th>Action</th> <!-- For toggling status -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in active_vehicles %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ vehicle.serial_number }}</td>
+                    <td>{{ vehicle.default_city }}, {{ vehicle.default_area }}</td>
+                    <td>{{ vehicle.current_latitude }}, {{ vehicle.current_longitude }}</td>
+                    <td>{{ vehicle.rented_by_mobile }}</td>
+                    <td>{{ vehicle.rent_received }}</td>
+                    <td>{{ vehicle.time_remaining }}</td>
+                    <td>{{ vehicle.battery_charge_status }}%</td>
+                    <td>
+                        <form method="POST" action="{% url 'toggle_vehicle_status' vehicle.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if vehicle.is_locked %}btn-secondary{% else %}btn-success{% endif %}">
+                                {% if vehicle.is_locked %}
+                                    Locked
+                                {% else %}
+                                    Unlocked
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                    <td>{{ vehicle.contact_support_person }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'toggle_vehicle_status' vehicle.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning">Move to Inactive</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr>
+
+        <!-- Inactive Vehicles Table -->
+        <h3>Inactive Vehicles</h3>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>No.</th>
+                    <th>Serial Number</th>
+                    <th>Default Location (City, Area)</th>
+                    <th>Current Location (Lat, Long)</th>
+                    <th>Last Rented By (Mobile)</th>
+                    <th>Last Rent Received</th>
+                    <th>Duration Rented</th>
+                    <th>Battery Charge Status</th>
+                    <th>Lock/Unlock</th>
+                    <th>Contact Support</th>
+                    <th>Out of Service</th>
+                    <th>Action</th> <!-- For toggling status -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in inactive_vehicles %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ vehicle.serial_number }}</td>
+                    <td>{{ vehicle.default_city }}, {{ vehicle.default_area }}</td>
+                    <td>{{ vehicle.current_latitude }}, {{ vehicle.current_longitude }}</td>
+                    <td>{{ vehicle.last_rented_mobile }}</td>
+                    <td>{{ vehicle.last_rent_received }}</td>
+                    <td>{{ vehicle.time_remaining }}</td>
+                    <td>{{ vehicle.battery_charge_status }}%</td>
+                    <td>
+                        <form method="POST" action="{% url 'toggle_vehicle_status' vehicle.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if vehicle.is_locked %}btn-secondary{% else %}btn-success{% endif %}">
+                                {% if vehicle.is_locked %}
+                                    Locked
+                                {% else %}
+                                    Unlocked
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                    <td>{{ vehicle.contact_support_person }}</td>
+                    <td>{{ vehicle.is_out_of_service|yesno:"Yes,No" }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'toggle_vehicle_status' vehicle.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Move to Active</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

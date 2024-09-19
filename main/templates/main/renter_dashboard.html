@@ -1,0 +1,23 @@
+<!-- main/templates/main/renter_dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Renter Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the Renter Dashboard</h1>
+    
+    <!-- Display the username -->
+    <p>Logged in as: {{ user.username }}</p>
+
+    <!-- Edit Profile Button -->
+    <a href="{% url 'edit_renter' %}">Edit Profile</a>
+
+    <!-- Logout Button -->
+    <a href="{% url 'logout' %}">Logout</a>
+
+    <!-- Additional content for Renters -->
+</body>
+</html>

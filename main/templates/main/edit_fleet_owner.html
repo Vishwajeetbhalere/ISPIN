@@ -1,0 +1,37 @@
+<!-- main/templates/main/edit_fleet_owner.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Fleet Owner Profile</title>
+</head>
+<body>
+    <h1>Edit Your Information</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>User Information</legend>
+            {{ user_form.as_p }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Profile Information</legend>
+            {{ profile_form.as_p }}
+        </fieldset>
+
+        <button type="submit" class="button">Save Changes</button>
+    </form>
+
+    <a href="{% url 'fleet_owner_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>

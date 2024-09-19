@@ -1,0 +1,314 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page Individual Owner</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .toggle-btn input[type="checkbox"] {
+            display: none;
+        }
+        .toggle-btn .slider {
+            position: relative;
+            width: 34px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 34px;
+            transition: .4s;
+        }
+        .toggle-btn .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        .toggle-btn input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        .toggle-btn input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .logout-button a {
+            color: #fff;
+            background-color: #dc3545; /* Bootstrap's danger color for a red button */
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        
+        .logout-button a:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="logout-button">
+        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+    </div>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Home Page Individual Owner</h2>
+
+        {% if individual_owner %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome, {{ individual_owner.first_name }} {{ individual_owner.last_name }}</h5>
+                    <p class="card-text">
+                        <strong>Address:</strong> {{ individual_owner.address1 }}, {{ individual_owner.address2 }} <br>
+                        <strong>City:</strong> {{ individual_owner.city }} <br>
+                        <strong>State:</strong> {{ individual_owner.state }} <br>
+                        <strong>Country:</strong> {{ individual_owner.country }} <br>
+                        <strong>Email:</strong> {{ individual_owner.email }} <br>
+                        <strong>Phone:</strong> {{ individual_owner.primary_contact_no }} <br>
+                        <strong>Product Serial No:</strong> {{ individual_owner.product_serial_no }}
+                    </p>
+
+                    <!-- Edit Button -->
+                    <a href="{% url 'edit_individual_owner' individual_owner.id %}" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+
+            <!-- Display Vehicle Status -->
+            {% if vehicle_status %}
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Vehicle Status</h5>
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Starting Location:</strong></td>
+                                    <td id="starting-location-name">Fetching...</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Current Location:</strong></td>
+                                    <td id="current-location-name">Fetching...</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ending Location:</strong></td>
+                                    <td id="ending-location-name">Fetching...</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Main Battery Temp:</strong></td>
+                                    <td>{{ vehicle_status.main_battery_temp }}&#8451;</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Main Battery Current (in %):</strong></td>
+                                    <td>{{ vehicle_status.main_battery_current }}%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Auxiliary Battery Status (in %):</strong></td>
+                                    <td>{{ vehicle_status.auxiliary_battery_status }}%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Panic Button Status:</strong></td>
+                                    <td>
+                                        <label class="toggle-btn">
+                                            <input type="checkbox" id="panicButtonStatus" {% if vehicle_status.panic_button_status %} checked {% endif %}>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lock Status:</strong></td>
+                                    <td>
+                                        <label class="toggle-btn">
+                                            <input type="checkbox" id="lockStatus" {% if vehicle_status.lock_status %} checked {% endif %}>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Route:</strong></td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="showMap()">View Route</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Emergency Whatsapp:</strong></td>
+                                    <td>{{ vehicle_status.emergency_owner_whatsapp }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Geo-fencing Distance:</strong></td>
+                                    <td>
+                                        <select id="geoFencingLocation" class="form-select">
+                                            <option value="1 km" {% if vehicle_status.geo_fencing_distance == '1' %}selected{% endif %}>1 km</option>
+                                            <option value="1.5 km" {% if vehicle_status.geo_fencing_distance == '1.5' %}selected{% endif %}>1.5 km</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Update Button -->
+                        <button class="btn btn-primary" onclick="updateStatus()">Update Status</button>
+                    </div>
+                </div>
+            {% else %}
+                <p class="mt-4 alert alert-info">No vehicle status available for this user.</p>
+            {% endif %}
+        {% else %}
+            <p class="mt-4 alert alert-warning">No data available for this user.</p>
+        {% endif %}
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Map View</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="map"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Load Google Maps API Asynchronously -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_QSTUlqPA9Gr3XH6AQKRfbouVqM97KTc"></script>
+
+    <script>
+        function updateStatus() {
+            const panicButtonStatus = document.getElementById('panicButtonStatus').checked;
+            const lockStatus = document.getElementById('lockStatus').checked;
+            const geoFencingLocation = document.getElementById('geoFencingLocation').value;
+            const csrfToken = '{{ csrf_token }}';
+
+            fetch('{% url "update_status" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken  // Include the CSRF token in the request header
+                },
+                body: JSON.stringify({
+                    panicButtonStatus: panicButtonStatus,
+                    lockStatus: lockStatus,
+                    geoFencingLocation: geoFencingLocation
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert(data.message);  // Show a message to the user
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function showMap() {
+            const startLat = {{ vehicle_status.starting_latitude }};
+            const startLng = {{ vehicle_status.starting_longitude }};
+            const endLat = {{ vehicle_status.ending_latitude }};
+            const endLng = {{ vehicle_status.ending_longitude }};
+            const currentLat = {{ vehicle_status.current_latitude }};
+            const currentLng = {{ vehicle_status.current_longitude }};
+
+            const mapOptions = {
+                center: new google.maps.LatLng(currentLat, currentLng),
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(startLat, startLng),
+                map: map,
+                title: 'Starting Location'
+            });
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(endLat, endLng),
+                map: map,
+                title: 'Ending Location'
+            });
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(currentLat, currentLng),
+                map: map,
+                title: 'Current Location'
+            });
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            const request = {
+                origin: new google.maps.LatLng(startLat, startLng),
+                destination: new google.maps.LatLng(endLat, endLng),
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, function(result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                }
+            });
+
+            new bootstrap.Modal(document.getElementById('mapModal')).show();
+        }
+
+        // Fetch location names using Google Geocoding API
+        function getLocationNames() {
+            const geocoder = new google.maps.Geocoder();
+            const locations = [
+                { lat: {{ vehicle_status.starting_latitude }}, lng: {{ vehicle_status.starting_longitude }}, elementId: 'starting-location-name' },
+                { lat: {{ vehicle_status.current_latitude }}, lng: {{ vehicle_status.current_longitude }}, elementId: 'current-location-name' },
+                { lat: {{ vehicle_status.ending_latitude }}, lng: {{ vehicle_status.ending_longitude }}, elementId: 'ending-location-name' }
+            ];
+
+            locations.forEach(location => {
+                geocoder.geocode({ location: { lat: location.lat, lng: location.lng } }, (results, status) => {
+                    if (status === google.maps.GeocoderStatus.OK && results[0]) {
+                        document.getElementById(location.elementId).textContent = results[0].formatted_address;
+                    } else {
+                        document.getElementById(location.elementId).textContent = 'Address not found';
+                    }
+                });
+            });
+        }
+
+        // Ensure Google Maps API is loaded before calling the geocoder
+        window.onload = function() {
+            getLocationNames();
+        };
+    </script>
+</body>
+</html> 

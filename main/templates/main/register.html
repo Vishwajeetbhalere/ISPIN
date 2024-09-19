@@ -1,0 +1,416 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <title>Register</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .fade-in.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Background and Logo -->
+    <div class="relative h-screen">
+        <img class="absolute inset-0" src="{% static 'images/background.jpg' %}" alt="background">
+        <div class="absolute w-full flex justify-center top-20">
+            <img class="h-20 w-64" src="{% static 'images/logo.svg' %}" alt="Logo">
+        </div>
+
+        <!-- Initial Selection Container -->
+        <div id="initial-selection" class="absolute w-full h-screen flex justify-center items-center mt-20">
+            <div class="bg-white p-10 rounded-xl w-1/3 fade-in active">
+                <div class="text-xl text-center font-semibold font-inter">Register</div>
+
+                <!-- Custom User Form Fields -->
+                <form id="user-form" method="POST">
+                    {% csrf_token %}
+                    <div class="flex flex-col space-y-4 mt-6">
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Username" name="username" required />
+                        <input type="email" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Email" name="email" required />
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="First Name" name="first_name" required />
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Last Name" name="last_name" required />
+
+                        <!-- User Type Selection -->
+                        <select name="user_type" id="id_user_type" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2">
+                            <option value="">Select User Type</option>
+                            <option value="Individual_Owner">Individual Owner</option>
+                            <option value="Fleet_Owner">Fleet Owner</option>
+                            <option value="Support_Engineer">Support Personnel</option>
+                        </select>
+
+                        <!-- Password fields -->
+                        <input type="password" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Password" name="password" required />
+                        <input type="password" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Confirm Password" name="password_confirmation" required />
+                    </div>
+
+                    <div class="w-full mt-6 flex justify-center">
+                        <button type="button" id="save-continue" class="w-full h-12 bg-blue-600 font-medium text-base text-white rounded-md">
+                            Save & Continue
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Already have an account -->
+                <div class="flex justify-center mt-6">
+                    <div class="text-gray-400 font-normal text-base font-inter">Already have an account?</div>
+                    <a href="{% url 'login' %}" class="text-blue-600 font-normal text-base font-inter ml-2">Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role-Specific Form Container -->
+        <div id="role-form-container" class="absolute hidden w-full h-screen flex justify-center items-center">
+            <div class="bg-white p-10 rounded-xl w-1/3 fade-in active">
+                <div class="text-xl text-center font-semibold font-inter">Additional Details</div>
+
+                <form id="role-form" method="POST">
+                    {% csrf_token %}
+
+                    <!-- Individual Owner Fields -->
+                    <div id="individual-owner-fields" class="hidden role-specific-form space-y-4 mt-6">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="emergency_contact_no" placeholder="Emergency Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="product_serial_no" placeholder="Product Serial No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="home_location" placeholder="Home Location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <select name="geo_fencing_location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2">
+                            <option value="">Select Geo Fencing</option>
+                            <option value="1 KM">1 KM</option>
+                            <option value="1.5 KM">1.5 KM</option>
+                        </select>
+                    </div>
+
+                    <!-- Fleet Owner Fields -->
+                    <div id="fleet-owner-fields" class="hidden role-specific-form space-y-4 mt-6">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="product_serial_no" placeholder="Product Serial No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="launch_city" placeholder="Launch City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="launch_area" placeholder="Launch Area" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="deploy_location" placeholder="Deploy Location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <select name="geo_fencing_location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2">
+                            <option value="">Select Geo Fencing</option>
+                            <option value="1 KM">1 KM</option>
+                            <option value="1.5 KM">1.5 KM</option>
+                        </select>
+                        <input type="text" name="support_engineer_first_name" placeholder="Support Engineer First Name" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="support_engineer_last_name" placeholder="Support Engineer Last Name" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="support_engineer_contact_number" placeholder="Support Engineer Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                    </div>
+
+                    <!-- Support Engineer Fields -->
+                    <div id="support-engineer-fields" class="hidden role-specific-form space-y-4 mt-6">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_state" placeholder="Service State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_city" placeholder="Service City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_area" placeholder="Service Area" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                    </div>
+
+                    <div class="w-full mt-6 flex justify-center">
+                        <button type="submit" class="w-full h-12 bg-blue-600 font-medium text-base text-white rounded-md">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to Handle Form Display -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveContinueButton = document.getElementById('save-continue');
+            const initialSelection = document.getElementById('initial-selection');
+            const roleFormContainer = document.getElementById('role-form-container');
+            const roleSpecificForms = document.querySelectorAll('.role-specific-form');
+            const roleField = document.getElementById('id_user_type');
+        
+            saveContinueButton.addEventListener('click', function () {
+                roleSpecificForms.forEach(form => form.classList.add('hidden'));
+        
+                const selectedRole = roleField.value;
+                if (selectedRole) {
+                    roleFormContainer.classList.remove('hidden');
+                    initialSelection.classList.add('hidden');
+        
+                    if (selectedRole === 'Individual_Owner') {
+                        document.getElementById('individual-owner-fields').classList.remove('hidden');
+                    } else if (selectedRole === 'Fleet_Owner') {
+                        document.getElementById('fleet-owner-fields').classList.remove('hidden');
+                    } else if (selectedRole === 'Support_Engineer') {
+                        document.getElementById('support-engineer-fields').classList.remove('hidden');
+                    }
+                }
+            });
+        
+            // Submit role-specific form data
+            document.getElementById('role-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+        
+                const formData = new FormData(document.getElementById('user-form')); // Collect user form data
+                new FormData(this).forEach((value, key) => {
+                    formData.append(key, value); // Add role-specific form data
+                });
+        
+                fetch("{% url 'register' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}"
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // If the response is an HTML redirect (like a Django success response), redirect the user.
+                        window.location.href = "{% url 'login' %}";
+                    } else {
+                        return response.json(); // Try to parse as JSON if not a redirect
+                    }
+                })
+                .then(data => {
+                    if (data && data.errors) {
+                        console.log(data.errors); // Log validation errors if returned
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+</body>
+
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <title>Register</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .fade-in.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Background and Logo -->
+    <div class="relative h-screen">
+        <img class="absolute inset-0" src="{% static 'images/background.jpg' %}" alt="background">
+        <div class="absolute w-full flex justify-center top-20">
+            <img class="h-20 w-64" src="{% static 'images/logo.svg' %}" alt="Logo">
+        </div>
+
+        <!-- Initial User Fields Container -->
+        <div id="initial-selection" class="absolute w-full h-screen flex justify-center items-center mt-20">
+            <div class="bg-white p-10 rounded-xl w-1/3 fade-in active">
+                <div class="text-xl text-center font-semibold font-inter">Register</div>
+
+                <form id="user-form" method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <div class="flex flex-col space-y-4 mt-6">
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Username" name="username" required />
+                        <input type="email" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Email" name="email" required />
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="First Name" name="first_name" required />
+                        <input type="text" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Last Name" name="last_name" required />
+
+                        <!-- User Type Selection -->
+                        <select name="user_type" id="id_user_type" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" required>
+                            <option value="">Select User Type</option>
+                            <option value="Individual_Owner">Individual Owner</option>
+                            <option value="Fleet_Owner">Fleet Owner</option>
+                            <option value="Support_Engineer">Support Engineer</option>
+                        </select>
+
+                        <!-- Password fields -->
+                        <input type="password" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Password" name="password1" required />
+                        <input type="password" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2"
+                            placeholder="Confirm Password" name="password2" required />
+                    </div>
+
+                    <div class="w-full mt-6 flex justify-center">
+                        <button type="button" id="save-continue" class="w-full h-12 bg-blue-600 font-medium text-base text-white rounded-md">
+                            Save & Continue
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Already have an account -->
+                <div class="flex justify-center mt-6">
+                    <div class="text-gray-400 font-normal text-base font-inter">Already have an account?</div>
+                    <a href="{% url 'login' %}" class="text-blue-600 font-normal text-base font-inter ml-2">Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role-Specific Fields Container -->
+        <div id="role-form-container" class="absolute hidden w-full h-screen flex justify-center items-center">
+            <div class="bg-white p-10 rounded-xl w-1/3 fade-in active">
+                <div class="text-xl text-center font-semibold font-inter">Additional Details</div>
+
+                <form id="role-form" method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+
+                    <!-- Individual Owner Fields -->
+                    <div id="individual-owner-fields" class="role-specific-form space-y-4 hidden">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="emergency_contact_no" placeholder="Emergency Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="product_serial_no" placeholder="Product Serial No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="home_location" placeholder="Home Location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <select name="geo_fencing_location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2">
+                            <option value="">Select Geo Fencing</option>
+                            <option value="1 KM">1 KM</option>
+                            <option value="1.5 KM">1.5 KM</option>
+                        </select>
+                    </div>
+
+                    <!-- Fleet Owner Fields -->
+                    <div id="fleet-owner-fields" class="role-specific-form space-y-4 hidden">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="product_serial_no" placeholder="Product Serial No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="launch_city" placeholder="Launch City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="launch_area" placeholder="Launch Area" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="deploy_location" placeholder="Deploy Location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <select name="geo_fencing_location" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2">
+                            <option value="">Select Geo Fencing</option>
+                            <option value="1 KM">1 KM</option>
+                            <option value="1.5 KM">1.5 KM</option>
+                        </select>
+                        <input type="text" name="support_engineer_first_name" placeholder="Support Engineer First Name" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="support_engineer_last_name" placeholder="Support Engineer Last Name" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="support_engineer_contact_number" placeholder="Support Engineer Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                    </div>
+
+                    <!-- Support Engineer Fields -->
+                    <div id="support-engineer-fields" class="role-specific-form space-y-4 hidden">
+                        <input type="text" name="address1" placeholder="Address 1" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="address2" placeholder="Address 2" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="city" placeholder="City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="state" placeholder="State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="country" placeholder="Country" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="pin" placeholder="Pin Code" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="primary_contact_no" placeholder="Primary Contact No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="whatsapp_number" placeholder="WhatsApp No" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_state" placeholder="Service State" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_city" placeholder="Service City" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                        <input type="text" name="service_area" placeholder="Service Area" class="border-2 w-full h-12 rounded-md focus:border-blue-500 border-gray-400 px-2" />
+                    </div>
+
+                    <div class="w-full mt-6 flex justify-center">
+                        <button type="submit" class="w-full h-12 bg-blue-600 font-medium text-base text-white rounded-md">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to Handle Form Display -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveContinueButton = document.getElementById('save-continue');
+            const initialSelection = document.getElementById('initial-selection');
+            const roleFormContainer = document.getElementById('role-form-container');
+            const roleSpecificForms = document.querySelectorAll('.role-specific-form');
+            const roleField = document.getElementById('id_user_type');
+
+            saveContinueButton.addEventListener('click', function () {
+                roleSpecificForms.forEach(form => form.classList.add('hidden'));
+
+                const selectedRole = roleField.value;
+                if (selectedRole) {
+                    roleFormContainer.classList.remove('hidden');
+                    initialSelection.classList.add('hidden');
+
+                    if (selectedRole === 'Individual_Owner') {
+                        document.getElementById('individual-owner-fields').classList.remove('hidden');
+                    } else if (selectedRole === 'Fleet_Owner') {
+                        document.getElementById('fleet-owner-fields').classList.remove('hidden');
+                    } else if (selectedRole === 'Support_Engineer') {
+                        document.getElementById('support-engineer-fields').classList.remove('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

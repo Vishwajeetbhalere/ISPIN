@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %} <!-- Load the static tag library -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <title>Individual Owner Dashboard</title>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': 'Inter',
+                    },
+                    colors: {
+                        'gray1': '#6C778B',
+                        'gray2': '#F2F4F7',
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="w-screen h-screen relative">
+    <div class="flex w-full h-full">
+
+        <!-- Sidebar -->
+        <div class="flex flex-col justify-between border border-r h-screen w-16 relative">
+            <div>
+                <div class="mt-5 pl-4 h-11">
+                    <img class="w-7 h-7" src="{% static 'images/wheelchair.svg' %}">
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src="{% static 'images/grid.svg' %}">
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src="{% static 'images/wheelchair1.svg' %}">
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src="{% static 'images/profile.svg' %}">
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src="{% static 'images/settings.svg' %}">
+                </div>
+            </div>
+
+            <!-- Profile Avatar with Dropdown -->
+            <div class="pl-4 h-11 w-16 relative">
+                <img class="w-7 h-7 cursor-pointer" src="{% static 'images/avatar1.png' %}" id="profileIcon" onclick="toggleProfileMenu()">
+                
+                <!-- Profile Dropdown (hidden by default) -->
+                <div id="profileMenu" class="hidden absolute bottom-14 left-0 w-40 bg-white rounded-lg shadow-lg border transition-all duration-300 transform origin-bottom-left scale-y-0">
+                    <ul class="p-2 space-y-2">
+                        <li>
+                            <button onclick="window.location.href='{% url 'edit_individual_owner' individual_owner.id %}'"  class="w-full text-left py-2 px-4 hover:bg-gray-100 rounded-lg">Edit Profile</button>
+                        </li>
+                        <li>
+                            <button onclick="window.location.href='{% url 'logout' %}'" class="w-full text-left py-2 px-4 hover:bg-gray-100 rounded-lg">Logout</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="w-full bg-gray-100 px-10">
+            <div class="flex justify-between">
+                <!-- Search bar -->
+                <div class="mt-10 rounded-lg border-2 border-gray-400 bg-white w-96 h-11 pl-4 flex">
+                    <div class="h-6 w-6 pt-3">
+                        <img src="{% static 'images/search.svg' %}">
+                    </div>
+                    <input type="text" class="font-2xl pt-1 pl-4 text-lg font-normal font-inter" placeholder="Type to search..." />
+                </div>
+
+                <!-- Notification Bell -->
+                <div class="mt-10">
+                    <img src="{% static 'images/bell.svg' %}">
+                </div>
+            </div>
+
+            <!-- User Greeting -->
+            <div class="mt-10 rounded-lg border-2 border-gray-400 bg-white w-full h-auto pl-6 pt-6 break-words">
+                <div class="text-lg font-inter font-semibold">
+                    Hello, {{ individual_owner.user.first_name }}!
+                </div>
+
+                <!-- Vehicle Information Table -->
+                {% if vehicle_status %}
+                <div class="overflow-x-auto pb-2">
+                    <table class="table-auto w-full">
+                        <thead class="border-b-2 border-b-sky-400">
+                            <tr>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Wheelchair sr. no.</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Starting Location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Current Location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Panic Button Status</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Main Battery Status</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Auxiliary Battery Status</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Lock Status</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Route</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Contact Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-3 py-3">{{ individual_owner.product_serial_no }}</td>
+                                <td class="px-3 py-3">{{ starting_location }}</td>
+                                <td class="px-3 py-3">{{ current_location }}</td>
+
+                                <!-- Panic Button Status -->
+                                <td class="px-3 py-3 flex">
+                                    <div class="w-24 h-8 text-center rounded-full border bg-gray-200 flex items-center justify-center" id="panicStatusContainer">
+                                        <img src="{% static 'images/_Dot.svg' %}" class="w-3 h-3" />
+                                        <div class="ml-2" id="panicStatusText">
+                                            {% if vehicle_status.panic_button_status %}
+                                                <span class="text-red-600">Unsafe</span>
+                                            {% else %}
+                                                <span class="text-green-600">Safe</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="w-28 h-8 ml-4 text-center pb-1 text-red-600 bg-red-100 rounded-full border" id="activatePanicButton" onclick="activatePanic()">
+                                        Activate Panic
+                                    </div>
+                                </td>
+
+                                <td class="px-3 py-3">{{ vehicle_status.main_battery_current }}%</td>
+                                <td class="px-3 py-3">{{ vehicle_status.auxiliary_battery_status }}%</td>
+
+                                <!-- Lock Status -->
+                                <td class="px-3 py-3 flex">
+                                    <div id="unlockButton" class="w-28 h-8 bg-green-100 rounded-full border flex items-center justify-around py-3 px-4 cursor-pointer" onclick="toggleLock('unlock')">
+                                        <img src="{% static 'images/unlock.svg' %}">
+                                        <div class="text-center text-green-600">Unlocked</div>
+                                    </div>
+                                    <div id="lockButton" class="w-24 h-8 ml-4 bg-gray-200 rounded-full border flex items-center justify-around py-2 px-4 cursor-pointer" onclick="toggleLock('lock')">
+                                        <img src="{% static 'images/lock.svg' %}">
+                                        <div class="text-center text-gray-600">Lock</div>
+                                    </div>
+                                </td>
+
+                                <!-- Route -->
+                                <td class="px-3 py-3 text-nowrap">
+                                    <img class="w-6 h-6" src="{% static 'images/route.svg' %}" onclick="showMap()">
+                                </td>
+
+                                <!-- Contact Owner Button -->
+                                <td class="px-3 py-3">
+                                    <button class="btn btn-primary" onclick="openPopup('contact-owner')">Contact Owner</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup for Contact Owner -->
+    <div id="contact-owner" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white w-1/3 h-80 border rounded-xl pb-4">
+            <div class="text-xl text-red-600 font-inter font-semibold border-b-blue-500 border-b-2 py-5 pl-6">
+                Contact Owner
+            </div>
+            <div class="text-lg w-auto h-40 px-4 rounded mx-2 font-inter font-medium mt-2 bg-gray-100">
+                <!-- Custom text field -->
+                <textarea class="w-full h-full rounded-lg p-2 bg-gray-50" placeholder="Enter your message here..."></textarea>
+            </div>
+            <div class="flex mt-4 justify-end pr-4">
+                <button class="w-36 h-10 rounded-full text-white bg-blue-500 text-lg font-inter font-normal ml-2">Send Message</button>
+                <button class="w-20 h-10 rounded border text-lg font-inter font-normal ml-2" onclick="closePopup('contact-owner')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup for Route, with Map -->
+    <div id="route" class="flex absolute w-screen h-screen bg-black/50 hidden border rounded justify-center items-center top-0">
+        <div class="w-auto h-auto border rounded-xl bg-white pb-4">
+            <div class="flex justify-between py-5 px-6 border-b-blue-500 border-b-2">
+                <div class="text-xl text-gray-600 font-inter font-semibold">Route</div>
+                <div class="text-xl text-gray-600 font-inter font-semibold">Wheelchair No.: {{ individual_owner.product_serial_no }}</div>
+            </div>
+            <div class="py-14 px-16">
+                <div id="map" style="height: 400px; width: 600px;"></div>
+                <div class="flex mt-8 justify-center">
+                    <div class="flex w-auto h-10 bg-green-100 rounded border px-4 py-3 items-center">
+                        <button class="text-lg font-inter font-normal text-green-600" onclick="openGoogleMaps()">Get directions</button>
+                        <img class="w-4 h-4 ml-3" src="{% static 'images/direction.svg' %}">
+                    </div>
+                    <button class="w-20 h-10 rounded border text-lg font-inter font-normal ml-2" onclick="closePopup('route')">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panic Popup Modal -->
+    <div id="activatePanicModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white w-1/3 h-48 border rounded-xl pb-4">
+            <div class="text-xl text-red-600 font-inter font-semibold py-5 pl-6 border-b-blue-500 border-b-2">
+                Activate Panic
+            </div>
+            <hr />
+            <div class="text-lg font-inter font-medium text-center mt-2 ">
+                Activate Panic if you are in danger!
+            </div>
+            <div class="flex mt-8 justify-center">
+                <button class="w-20 h-10 bg-red-100 text-lg font-inter font-normal text-red-600 rounded border" onclick="confirmPanic(true)">Activate</button>
+                <button class="w-20 h-10 rounded border text-lg font-inter font-normal ml-2" onclick="closePanicModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lock/Unlock Confirmation Popup Modal -->
+    <div id="lockDeviceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white w-1/3 h-48 border rounded-xl pb-4">
+            <div class="text-xl text-red-600 font-inter font-semibold py-5 pl-6 border-b-blue-500 border-b-2">
+                Confirm Lock/Unlock
+            </div>
+            <hr />
+            <div class="text-lg font-inter font-medium text-center mt-2 ">
+                Are you sure you want to change the lock status?
+            </div>
+            <div class="flex mt-8 justify-center">
+                <button class="w-20 h-10 bg-green-100 text-lg font-inter font-normal text-green-600 rounded border" onclick="confirmLock(true)">Yes</button>
+                <button class="w-20 h-10 rounded border text-lg font-inter font-normal ml-2" onclick="closeLockModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_QSTUlqPA9Gr3XH6AQKRfbouVqM97KTc"></script>
+
+    <script>
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profileMenu');
+            profileMenu.classList.toggle('hidden');
+            profileMenu.classList.toggle('scale-y-0');
+        }
+
+        function activatePanic() {
+            document.getElementById('activatePanicModal').classList.remove('hidden');
+        }
+
+        function closePanicModal() {
+            document.getElementById('activatePanicModal').classList.add('hidden');
+        }
+
+        function confirmPanic(confirmed) {
+            if (confirmed) {
+                document.getElementById('panicStatusText').innerHTML = '<span class="text-red-600">Unsafe</span>';
+                closePanicModal();
+            }
+        }
+
+        function toggleLock(status) {
+            document.getElementById('lockDeviceModal').classList.remove('hidden');
+        }
+
+        function confirmLock(confirmed) {
+            if (confirmed) {
+                const unlockButton = document.getElementById('unlockButton');
+                const lockButton = document.getElementById('lockButton');
+
+                if (lockButton.classList.contains('bg-red-100')) {
+                    unlockButton.classList.add('bg-green-100');
+                    unlockButton.querySelector('div').classList.add('text-green-600');
+                    lockButton.classList.remove('bg-red-100');
+                    lockButton.querySelector('div').classList.remove('text-red-600');
+                    lockButton.querySelector('div').classList.add('text-gray-600');
+                } else {
+                    lockButton.classList.add('bg-red-100');
+                    lockButton.querySelector('div').classList.add('text-red-600');
+                    unlockButton.classList.remove('bg-green-100');
+                    unlockButton.querySelector('div').classList.remove('text-green-600');
+                    unlockButton.querySelector('div').classList.add('text-gray-600');
+                }
+            }
+            closeLockModal();
+        }
+
+        function closeLockModal() {
+            document.getElementById('lockDeviceModal').classList.add('hidden');
+        }
+
+        function openPopup(popupId) {
+            document.getElementById(popupId).classList.remove('hidden');
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.add('hidden');
+        }
+
+        function showMap() {
+            const startLat = {{ vehicle_status.starting_latitude }};
+            const startLng = {{ vehicle_status.starting_longitude }};
+            const endLat = {{ vehicle_status.ending_latitude }};
+            const endLng = {{ vehicle_status.ending_longitude }};
+            const currentLat = {{ vehicle_status.current_latitude }};
+            const currentLng = {{ vehicle_status.current_longitude }};
+
+            const mapOptions = {
+                center: new google.maps.LatLng(currentLat, currentLng),
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(startLat, startLng),
+                map: map,
+                title: 'Starting Location'
+            });
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(endLat, endLng),
+                map: map,
+                title: 'Ending Location'
+            });
+
+            new google.maps.Marker({
+                position: new google.maps.LatLng(currentLat, currentLng),
+                map: map,
+                title: 'Current Location'
+            });
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            const request = {
+                origin: new google.maps.LatLng(startLat, startLng),
+                destination: new google.maps.LatLng(endLat, endLng),
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, function(result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                }
+            });
+
+            openPopup('route');
+        }
+
+        function openGoogleMaps() {
+            const startLat = {{ vehicle_status.starting_latitude }};
+            const startLng = {{ vehicle_status.starting_longitude }};
+            const endLat = {{ vehicle_status.ending_latitude }};
+            const endLng = {{ vehicle_status.ending_longitude }};
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${endLat},${endLng}&travelmode=driving`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

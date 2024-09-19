@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>Fleet Owner Dashboard</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    font: {
+                        'inter': 'Inter'
+                    },
+                    colors: {
+                        'gray1': '#6C778B',
+                        'gray2': '#F2F4F7',
+                        'blue1': '#4461F2'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="w-screen h-screen relative">
+    <div class="flex w-full h-full">
+        <div class="flex flex-col justify-between border border-r h-screen w-16">
+            <!-- Sidebar Icons -->
+            <div>
+                <div class="mt-5 pl-4 h-11">
+                    <img class="w-7 h-7" src='/static/images/wheelchair.svg'>
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src='/static/images/grid.svg'>
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src='/static/images/wheelchair1.svg'>
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src='/static/images/profile.svg'>
+                </div>
+                <div class="mt-10 pl-4 h-11 w-16">
+                    <img class="w-7 h-7" src='/static/images/settings.svg'>
+                </div>
+            </div>
+            {% comment %} <div class="pl-4 h-11 w-16">
+                <img class="w-7 h-7" src='/static/images/avatar1.png'>
+            </div> {% endcomment %}
+            <div class="pl-4 h-11 w-16 relative">
+                <img class="w-7 h-7 cursor-pointer" src='/static/images/avatar1.png' id="profileIcon" onclick="toggleProfileMenu()">
+                
+                <!-- Profile Dropdown (hidden by default) -->
+                <div id="profileMenu" class="hidden absolute bottom-14 left-0 w-40 bg-white rounded-lg shadow-lg border transition-all duration-300 transform origin-bottom-left scale-y-0">
+                    <ul class="p-2 space-y-2">
+                        <li>
+                            <button onclick="window.location.href='{% url 'edit_fleet_owner' %}'"  class="w-full text-left py-2 px-4 hover:bg-gray-100 rounded-lg">Edit Profile</button>
+                        </li>
+                        <li>
+                            <button onclick="window.location.href='{% url 'logout' %}'" class="w-full text-left py-2 px-4 hover:bg-gray-100 rounded-lg">Logout</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-[calc(100%_-_4rem)] bg-gray-100 px-10">
+            <!-- Search and Notification -->
+            <div class="flex justify-between">
+                <div class="mt-10 rounded-lg focus:border-blue-500 border-2 border-gray-400 bg-white w-96 h-11 pl-4 flex">
+                    <div class="h-6 w-6 pt-3">
+                        <img src="/static/images/search.svg">
+                    </div>
+                    <div>
+                        <input type="text" class="font-2xl pt-1 pl-4 text-lg font-normal font-inter" placeholder="Type to search..." />
+                    </div>
+                </div>
+                <div class="mt-10">
+                    <img src="/static/images/bell.svg">
+                </div>
+            </div>
+
+            <!-- Tabs for wheelchairs -->
+            <div class="mt-10 flex pt-4">
+                <div class="w-72 text-lg font-semibold font-inter h-14 bg-white rounded-lg px-4 pt-2">
+                    List of wheelchairs under use
+                </div>
+                <div class="w-72 text-lg font-semibold font-inter h-14 bg-gray-100 rounded-lg ml-4 px-4 pt-2">
+                    List of wheelchairs unused
+                </div>
+                <div class="w-72 text-lg font-semibold font-inter h-14 bg-gray-100 rounded-lg ml-4 px-4 pt-2">
+                    Revenue
+                </div>
+            </div>
+
+            <!-- Table for Active Wheelchairs -->
+            <div class="rounded-lg bg-white w-full h-auto mt-6">
+                <div class="flex justify-between px-6 py-6">
+                    <div class="text-lg font-inter font-semibold">
+                        Wheelchairs under use (Active Vehicles)
+                    </div>
+                    <div class="flex">
+                        <div class="flex items-center justify-between pt-3">
+                            <img class="w-5 h-5" src="/static/images/trash.svg" alt="">
+                            <h1 class="ml-2 text-sm font-inter font-medium">Delete</h1>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 ml-4">
+                            <img class="w-5 h-5" src="/static/images/filter.svg" alt="">
+                            <h1 class="ml-2 text-sm font-inter font-medium">Filters</h1>
+                        </div>
+                        <div class="flex items-center justify-center ml-4 border rounded-xl w-24 h-10 pt-2">
+                            <img class="w-5 h-5" src="/static/images/export.svg" alt="">
+                            <h1 class="ml-2 text-sm font-inter font-medium">Export</h1>
+                        </div>
+                        <div class="flex items-center justify-center ml-4 bg-blue-600 rounded-xl w-32 h-10 pt-2">
+                            <img class="w-5 h-5" src="/static/images/plus.svg" alt="">
+                            <h1 class="ml-2 text-white text-sm font-inter font-medium">New entry</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-scroll pb-2">
+                    <table class="table-auto w-full">
+                        <thead class="border-b border-b-blue1">
+                            <tr>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">
+                                    <img src="/static/images/checkbox.svg" alt="">
+                                </th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">No.</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Wheelchair sr. no.</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Default location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Current location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Rented by</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Rent received</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Time remaining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Active Vehicles -->
+                            {% for vehicle in active_vehicles %}
+                            <tr>
+                                <td class="px-3 py-3 text-gray-600">
+                                    <input type="checkbox">
+                                </td>
+                                <td class="px-3 py-3 text-gray-600">{{ forloop.counter }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.serial_number }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.default_city }}, {{ vehicle.default_area }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.current_latitude }}, {{ vehicle.current_longitude }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.rented_by_mobile }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.rent_received }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.time_remaining }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table for Inactive Wheelchairs -->
+            <div class="rounded-lg bg-white w-full h-auto mt-6">
+                <div class="flex justify-between px-6 py-6">
+                    <div class="text-lg font-inter font-semibold">
+                        Wheelchairs unused (Inactive Vehicles)
+                    </div>
+                </div>
+
+                <div class="overflow-scroll pb-2">
+                    <table class="table-auto w-full">
+                        <thead class="border-b border-b-blue1">
+                            <tr>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">
+                                    <img src="/static/images/checkbox.svg" alt="">
+                                </th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">No.</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Wheelchair sr. no.</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Default location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Current location</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Last rented by</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Last rent received</th>
+                                <th class="font-normal text-left py-3 px-3 text-gray-600">Time rented</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Inactive Vehicles -->
+                            {% for vehicle in inactive_vehicles %}
+                            <tr>
+                                <td class="px-3 py-3 text-gray-600">
+                                    <input type="checkbox">
+                                </td>
+                                <td class="px-3 py-3 text-gray-600">{{ forloop.counter }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.serial_number }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.default_city }}, {{ vehicle.default_area }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.current_latitude }}, {{ vehicle.current_longitude }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.last_rented_mobile }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.last_rent_received }}</td>
+                                <td class="px-3 py-3 text-gray-600">{{ vehicle.time_remaining }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+                function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profileMenu');
+            profileMenu.classList.toggle('hidden');
+            profileMenu.classList.toggle('scale-y-0');
+        }
+    </script>
+
+
+</body>
+
+</html>
